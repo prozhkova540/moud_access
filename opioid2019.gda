@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <title>opioid_2019</title>
+    <layers>
+        <layer>
+            <datasource>
+                <type>CSV</type>
+                <path>data_geoda/opioid_2019.csv</path>
+            </datasource>
+            <layername>opioid_2019</layername>
+            <title/>
+            <variable_order>
+                <time_ids>
+                    <id>time 0</id>
+                </time_ids>
+                <var>field_1</var>
+                <var>
+                    area
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>area_num_1</var>
+                <var>area_numbe</var>
+                <var>
+                    comarea
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    comarea_id
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>community</var>
+                <var>
+                    perimeter
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    shape_area
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    shape_len
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>geometry</var>
+                <var>casenumber</var>
+                <var>death_date</var>
+                <var>age</var>
+                <var>gender</var>
+                <var>race</var>
+                <var>latino</var>
+                <var>manner</var>
+                <var>primarycause</var>
+                <var>gunrelated</var>
+                <var>opioids</var>
+                <var>incident_street</var>
+                <var>incident_city</var>
+                <var>incident_zip</var>
+                <var>
+                    longitude
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    latitude
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>location</var>
+            </variable_order>
+            <custom_classifications/>
+            <weights_entries/>
+            <default_vars>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+            </default_vars>
+        </layer>
+    </layers>
+</project>
