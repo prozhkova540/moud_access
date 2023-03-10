@@ -48,7 +48,8 @@ clinics = pd.read_excel((os.path.join(path, 'inputs/clinics.xlsx')), sheet_name=
 treatment = pd.read_excel((os.path.join(path, 'inputs/TreatmentProgram.xlsx')), sheet_name=0)
 pharmacy = pd.read_csv(os.path.join(path, 'inputs/Pharmacy_Status.csv'))
 bupren = pd.read_csv(os.path.join(path, 'inputs/locator_export.csv'))
-demograph = pd.read_excel(os.path.join(path, 'inputs/heartland_alliance_community_data.xlsx'))
+demograph = pd.read_excel((os.path.join(
+    path, 'inputs/heartland_alliance_community_data.xlsx')), sheet_name=1)
 
 
 # dictionary mapping community names to coordinates
@@ -62,6 +63,9 @@ bupren = bupren[(bupren['county'] == 'COOK') & ((bupren['city'] == 'Chicago')
 bupren_gdf = geopandas.GeoDataFrame(
     bupren, geometry=geopandas.points_from_xy(bupren.longitude, bupren.latitude))
 
+# pharmacy = pharmacy.rename(columns={'New Georeferenced Column': 'point_obect'})
+# pharmacy_gdf = geopandas.GeoDataFrame(data=pharmacy, geometry=pharmacy['point_object'], crs=4329)
+# pharmacy['longitude'] = pharmacy['point_object'].apply(lambda p: p.x)
 
 # opioid related deaths by community area 2019, 2020, 2021
 
@@ -82,8 +86,21 @@ opioid_df = opioid_df.rename(columns={'chi_commarea': 'community'})
 print(opioid_df.shape)
 print(opioid_df.isna().sum())
 
+# drop suicicdes, homicides, undetermined
+opioid_df = opioid_df[(opioid_df['manner'] == 'ACCIDENT') | (opioid_df['manner'] == 'NATURAL')]
+
+
 # dropping 227 incidents where we don't have a location
 opioid_df = opioid_df.dropna(subset=['location'])
+
+# have to convert strings to dummies or categorical variables as integers
+opioid_df = opioid_df.join(pd.get_dummies(opioid_df[['gender', 'race', 'manner']]))
+
+# opioid_df['race'] = opioid_df['race'].replace(['Black', 'Am. Indian', 'Asian',
+#                                                'Unknown', 'Other', 'White'], [1, 2, 3, 4, 5, 6])
+
+opioid_df['gender'] = np.where(opioid_df['gender'] == 'Female', 1, 0)
+
 opioid_shp = c_area.merge(opioid_df, on=['community'])
 
 opioid_2019 = opioid_shp[(opioid_shp['death_date'].dt.year == 2019)]
@@ -92,9 +109,45 @@ opioid_2020 = opioid_shp[(opioid_shp['death_date'].dt.year == 2020)]
 
 opioid_2021 = opioid_shp[(opioid_shp['death_date'].dt.year == 2021)]
 
-# have to convert strings to dummies or categorical variables as integers
+# number of deaths by community areas
+# merge this with demographic vars
+opioid_2019_grouped = pd.DataFrame(opioid_2019.groupby(
+    ['community'])['casenumber'].count()).reset_index()
+opioid_2020_grouped = pd.DataFrame(opioid_2020.groupby(
+    ['community'])['casenumber'].count()).reset_index()
+opioid_2021_grouped = pd.DataFrame(opioid_2021.groupby(
+    ['community'])['casenumber'].count()).reset_index()
 
+opioid_2019.groupby(['race'])['casenumber'].count()
+opioid_2020.groupby(['race'])['casenumber'].count()
+opioid_2021.groupby(['race'])['casenumber'].count()
+
+
+# demographics of interest
+demograph = demograph.set_index('Indicator')
+demograph = demograph.T
+demograph = demograph.reset_index()
+demograph = demograph.rename(columns={'index': 'community'})
+demograph['community'] = demograph['community'].str.upper()
+
+demograph_shp = c_area.merge(demograph, on=['community'])
+
+merge_all_2019 = demograph_shp.merge(opioid_2019_grouped, on=['community'])
+merge_all_2020 = demograph_shp.merge(opioid_2020_grouped, on=['community'])
+merge_all_2021 = demograph_shp.merge(opioid_2021_grouped, on=['community'])
 
 # saving as csv for geoda use
 bupren_gdf.to_file('data_geoda/bupren.gpkg', layer='geometry', driver='GPKG')
+opioid_shp.to_csv('data_geoda/opioid_all.csv')
 opioid_2019.to_csv('data_geoda/opioid_2019.csv')
+opioid_2020.to_csv('data_geoda/opioid_2020.csv')
+opioid_2021.to_csv('data_geoda/opioid_2021.csv')
+
+
+demograph_shp.to_file('data_geoda/demographics.gpkg', layer='geometry')
+merge_all_2021.to_file('data_geoda/od_dem_2021.gpkg', layer='geometry')
+
+
+merge_all_2019.to_csv('data_geoda/od_dem_2019.csv')
+merge_all_2020.to_csv('data_geoda/od_dem_2020.csv')
+merge_all_2021.to_csv('data_geoda/od_dem_2021.csv')
