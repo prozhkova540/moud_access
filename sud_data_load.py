@@ -31,8 +31,9 @@ import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from shapely import wkt
 
-
+# RENAME path wherever you save the original data
 path = r'/Users/polinarozhkova/Desktop/GitHub/moud_access/'
+
 area_shp = os.path.join(path, 'inputs/Boundaries - Community Areas (current)',
                         'geo_export_122237a7-de0c-463d-b81f-e6d53bf2e92a.shp')
 c_area = geopandas.read_file(area_shp)
