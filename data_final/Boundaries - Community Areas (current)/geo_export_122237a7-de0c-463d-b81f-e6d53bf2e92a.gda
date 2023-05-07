@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <title>geo_export_122237a7-de0c-463d-b81f-e6d53bf2e92a</title>
+    <layers>
+        <layer>
+            <datasource>
+                <type>ESRI Shapefile</type>
+                <path>geo_export_122237a7-de0c-463d-b81f-e6d53bf2e92a.shp</path>
+            </datasource>
+            <layername>geo_export_122237a7-de0c-463d-b81f-e6d53bf2e92a</layername>
+            <title/>
+            <variable_order>
+                <time_ids>
+                    <id>time 0</id>
+                </time_ids>
+                <var>POLY_ID</var>
+                <var>
+                    area
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>area_num_1</var>
+                <var>area_numbe</var>
+                <var>
+                    comarea
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    comarea_id
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>community</var>
+                <var>
+                    perimeter
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    shape_area
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+                <var>
+                    shape_len
+                    <displayed_decimals>6</displayed_decimals>
+                </var>
+            </variable_order>
+            <custom_classifications/>
+            <weights_entries>
+                <weights>
+                    <title>q_order1</title>
+                    <default/>
+                    <meta_info>
+                        <weights_type>queen</weights_type>
+                        <order>1</order>
+                        <inc_lower_orders>false</inc_lower_orders>
+                        <path>/Users/polinarozhkova/Desktop/GitHub/moud_access/data_final/q_order1.gal</path>
+                        <id_variable>area_num_1</id_variable>
+                        <symmetry>symmetric</symmetry>
+                        <num_observations>77</num_observations>
+                        <min_neighbors>1</min_neighbors>
+                        <max_neighbors>9</max_neighbors>
+                        <mean_neighbors>5.116883116883117</mean_neighbors>
+                        <median_neighbors>5</median_neighbors>
+                        <non_zero_perc>6.6453027491988532</non_zero_perc>
+                    </meta_info>
+                </weights>
+                <weights>
+                    <title>shape_q</title>
+                    <meta_info>
+                        <weights_type>queen</weights_type>
+                        <order>1</order>
+                        <inc_lower_orders>false</inc_lower_orders>
+                        <path>/Users/polinarozhkova/Desktop/GitHub/moud_access/data_final/shape_q.gal</path>
+                        <id_variable>POLY_ID</id_variable>
+                        <symmetry>symmetric</symmetry>
+                        <num_observations>77</num_observations>
+                        <min_neighbors>1</min_neighbors>
+                        <max_neighbors>9</max_neighbors>
+                        <mean_neighbors>5.116883116883117</mean_neighbors>
+                        <median_neighbors>5</median_neighbors>
+                        <non_zero_perc>6.6453027491988532</non_zero_perc>
+                    </meta_info>
+                </weights>
+            </weights_entries>
+            <default_vars>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+                <default_var>
+                    <name/>
+                    <time_id>time 0</time_id>
+                </default_var>
+            </default_vars>
+        </layer>
+    </layers>
+</project>
