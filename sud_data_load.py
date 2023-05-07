@@ -20,15 +20,15 @@ Created on Tue Apr  4 21:49:29 2023
 # Medical Examiner Opioid Related Deaths - https://datacatalog.cookcountyil.gov/Public-Safety/Medical-Examiner-Case-Archive/cjeq-bs86/data
 
 import os
-import numpy as np
+# import numpy as np
 from sodapy import Socrata
 import pandas as pd
 import geopandas
 # from shapely.geometry import Point, Polygon
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+# import seaborn as sns
+# import matplotlib.pyplot as plt
+# import matplotlib.colors as colors
+# from mpl_toolkits.axes_grid1 import make_axes_locatable
 from shapely import wkt
 
 # RENAME path wherever you save the original data
@@ -46,6 +46,12 @@ bupren = pd.read_csv(os.path.join(path, 'inputs/locator_export.csv'))
 demograph = pd.read_excel(
     (os.path.join(path, 'inputs/heartland_alliance_community_data.xlsx')),
     sheet_name=1)
+
+test = demograph.transpose()
+test.columns = test.iloc[0]
+demograph = test.iloc[2:].reset_index()
+demograph['index'] = demograph['index'].str.upper()
+demograph = demograph.rename(columns={'index': 'community'})
 
 
 # use this to impute community area names to locations of bupren providers
@@ -68,7 +74,8 @@ c_bupren_join = geopandas.GeoDataFrame(
                                                      c_bupren_join.latitude))
 
 bupren_area = pd.DataFrame(c_bupren_join.groupby(
-     ['community'])['area'].count()).reset_index()
+     ['community'])['area'].count()).reset_index().rename(
+         columns={'area': 'bupren_area'})
 
 pharmacy['point_geo'] = pharmacy['New Georeferenced Column'
                                  ].dropna().astype(str).apply(wkt.loads)
@@ -78,7 +85,8 @@ c_pharmacy_join = geopandas.sjoin(c_area, pharmacy_gdf,
                                   how="inner", op='intersects')
 
 pharmacy_area = pd.DataFrame(c_pharmacy_join.groupby(
-     ['community'])['area'].count()).reset_index()
+     ['community'])['area'].count()).reset_index().rename(
+         columns={'area': 'pharmacy_area'})
 
 # opioid related deaths by community area 2019, 2020, 2021
 opioid_df = chicago_opioid[['casenumber', 'death_date', 'age', 'gender',
@@ -124,12 +132,50 @@ opioid_2021 = opioid_shp[(opioid_shp['death_date'].dt.year == 2021)]
 # # merge this with demographic vars
 opioid_2019_grouped = pd.DataFrame(opioid_2019.groupby(
      ['community'])['casenumber'].count()).reset_index()
+
 opioid_2020_grouped = pd.DataFrame(opioid_2020.groupby(
      ['community'])['casenumber'].count()).reset_index()
+
 opioid_2021_grouped = pd.DataFrame(opioid_2021.groupby(
      ['community'])['casenumber'].count()).reset_index()
 
-test = c_area.merge(opioid_2019_grouped, how='outer').rename({'casenumber': 'num_od_2019'})
+final_df = c_area.merge(opioid_2019_grouped, how='outer').rename(
+    columns={'casenumber': 'od_2019'})
+final_df = final_df.merge(opioid_2020_grouped, how='outer').rename(
+    columns={'casenumber': 'od_2020'})
+final_df = final_df.merge(opioid_2021_grouped, how='outer').rename(
+    columns={'casenumber': 'od_2021'})
+
+
+final_df = final_df.merge(bupren_area, how='outer')
+final_df = final_df.merge(pharmacy_area, how='outer')
+
+
+final_df = final_df[['area_num_1', 'community', 'shape_area', 'shape_len',
+                     'geometry', 'od_2019', 'od_2020', 'od_2021',
+                     'bupren_area', 'pharmacy_area']].fillna(0)
+
+demograph2 = demograph[['community', '% in poverty, 2020',
+                        '% in extreme poverty, 2020', '% Female, 2020',
+                        '% Male, 2020', '% Asian, 2020', '% Black, 2020',
+                        '% Latino, 2020', '% White, 2020',
+                        '% of 18 to 24 years old, 2020',
+                        '% of 25 to 64 years old, 2020',
+                        '% of 65 years old or more, 2020',
+                        'Total population, 2020', 'Overall unemployment rate',
+                        'Youth unemployment rate for 20-24 yr. olds',
+                        '% with no high school diploma',
+                        '% with high school diploma/GED',
+                        "% with Bachelor's degree and higher",
+                        'Uninsured rate',
+                        'Average of median household income in 2020 dollars']]
+
+demograph.to_csv('data_final/chicago_demograph.csv', index=False)
+demograph2.to_csv('data_final/chicago_demograph_filtered.csv', index=False)
+final_df.to_csv('data_final/chicago_overdose.csv', index=False)
+
+
+final_merge = final_df.merge(demograph2, how='outer', indicator=True)
 
 # pharmacy = pharmacy.rename(columns={'New Georeferenced Column': 'point_obect'})
 # pharmacy_gdf = geopandas.GeoDataFrame(data=pharmacy, geometry=pharmacy['point_object'], crs=4329)
