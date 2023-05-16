@@ -47,12 +47,50 @@ demograph = pd.read_excel(
     (os.path.join(path, 'inputs/heartland_alliance_community_data.xlsx')),
     sheet_name=1)
 
+# Demographics
 test = demograph.transpose()
 test.columns = test.iloc[0]
 demograph = test.iloc[2:].reset_index()
 demograph['index'] = demograph['index'].str.upper()
 demograph = demograph.rename(columns={'index': 'community'})
 
+demograph = demograph.rename(
+    columns={'community': 'community',
+             '% in poverty, 2020': '% in Poverty',
+             '% in extreme poverty, 2020': '% in Extreme Poverty',
+             'Child poverty rate, 2020': 'Child Poverty Rate',
+             '% Female, 2020': '% Female',
+             '% Male, 2020': '% Male',
+             '% Asian, 2020': '% Asian',
+             '% Black, 2020': '% Black',
+             '% Latino, 2020': '% Hispanic',
+             '% White, 2020': '% White',
+             '% of 0 to 4 years old, 2020': '% Aged 0-4',
+             '% of 5 to 17 years old, 2020': '% Aged 5-17',
+             '% of 18 to 24 years old, 2020': '% Aged 18-24',
+             '% of 25 to 64 years old, 2020': '% Aged 25-64',
+             '% of 65 years old or more, 2020': '% Aged 65+',
+             'Total population, 2020': 'Total Pop.',
+             'Change in population from 2018 to 2019':
+                 'Change in Pop. (2018 to 2019)',
+             'Overall unemployment rate': 'Overall Unemp.',
+             'Youth unemployment rate for 16-19 yr. olds':
+                 'Unemp. 16-19 yr. olds',
+             'Youth unemployment rate for 20-24 yr. olds':
+                 'Unemp. 20-24 yr. olds',
+             '% with no high school diploma': '% no HS Diploma',
+             '% with high school diploma/GED': '% HS or GED',
+             '% with some college, no degree': 'Some College',
+             "% with Associate's degree": '% Associates Deg.',
+             "% with Bachelor's degree and higher": '% Bachelors Deg.',
+             'Foreclosure filings': 'Forclosure',
+             'Homeownership rate': 'Homeownership Rate',
+             'Rent burden': 'Rent Burden',
+             'SNAP Enrollment rate': 'SNAP Enrollment Rate',
+             '% receiving cash public assistance assistance': '% Cash Assist.',
+             'Uninsured rate': 'Uninsured Rate',
+             'Average of median household income in 2020 dollars':
+                 'Avg. Med. Household Income (2020 Dollars)'})
 
 # use this to impute community area names to locations of bupren providers
 area_dict = dict(zip(c_area.community, c_area.geometry))
@@ -155,20 +193,17 @@ final_df = final_df[['area_num_1', 'community', 'shape_area', 'shape_len',
                      'geometry', 'od_2019', 'od_2020', 'od_2021',
                      'bupren_area', 'pharmacy_area']].fillna(0)
 
-demograph2 = demograph[['community', '% in poverty, 2020',
-                        '% in extreme poverty, 2020', '% Female, 2020',
-                        '% Male, 2020', '% Asian, 2020', '% Black, 2020',
-                        '% Latino, 2020', '% White, 2020',
-                        '% of 18 to 24 years old, 2020',
-                        '% of 25 to 64 years old, 2020',
-                        '% of 65 years old or more, 2020',
-                        'Total population, 2020', 'Overall unemployment rate',
-                        'Youth unemployment rate for 20-24 yr. olds',
-                        '% with no high school diploma',
-                        '% with high school diploma/GED',
-                        "% with Bachelor's degree and higher",
-                        'Uninsured rate',
-                        'Average of median household income in 2020 dollars']]
+demograph2 = demograph[['community', '% in Poverty',
+                        '% in Extreme Poverty', '% Female',
+                        '% Black', '% Hispanic', '% White', '% Aged 0-4',
+                        '% Aged 5-17', '% Aged 18-24',
+                        '% Aged 25-64', '% Aged 65+',
+                        'Overall Unemp.', 'Unemp. 20-24 yr. olds',
+                        '% no HS Diploma', '% HS or GED',
+                        '% Bachelors Deg.', 'Homeownership Rate',
+                        'SNAP Enrollment Rate', '% Cash Assist.',
+                        'Uninsured Rate',
+                        'Avg. Med. Household Income (2020 Dollars)']]
 
 demograph.to_csv('data_final/chicago_demograph.csv', index=False)
 demograph2.to_csv('data_final/chicago_demograph_filtered.csv', index=False)
