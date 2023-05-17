@@ -93,6 +93,8 @@ demograph = demograph.rename(
                  'Avg. Med. Household Income (2020 Dollars)'})
 
 # use this to impute community area names to locations of bupren providers
+# map community areas to city regions 1-7
+
 area_dict = dict(zip(c_area.community, c_area.geometry))
 
 
@@ -193,7 +195,7 @@ final_df = final_df[['area_num_1', 'community', 'shape_area', 'shape_len',
                      'geometry', 'od_2019', 'od_2020', 'od_2021',
                      'bupren_area', 'pharmacy_area']].fillna(0)
 
-demograph2 = demograph[['community', '% in Poverty',
+demograph2 = demograph[['community', 'Total Pop.', '% in Poverty',
                         '% in Extreme Poverty', '% Female',
                         '% Black', '% Hispanic', '% White', '% Aged 0-4',
                         '% Aged 5-17', '% Aged 18-24',
