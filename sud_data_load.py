@@ -47,6 +47,21 @@ demograph = pd.read_excel(
     (os.path.join(path, 'inputs/heartland_alliance_community_data.xlsx')),
     sheet_name=1)
 
+# map community areas to city regions 1-7
+region_dict = {1: [49, 50, 51, 52, 53, 54, 55, 71, 72, 73, 74, 75],
+               2: [76, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+               3: [8, 32, 33],
+               4: [34, 37, 56, 57, 58, 59, 60, 61, 62, 63, 64,
+                   65, 66, 67, 68, 70],
+               5: [23, 24, 25, 26, 27, 28, 29, 30, 31],
+               6: [35, 36, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 69],
+               7: [1, 2, 3, 4, 5, 6, 7, 77]}
+
+df_regions = pd.DataFrame.from_dict(region_dict, orient='index').T.melt(
+    var_name='region', value_name='area_num_1').dropna(subset=['area_num_1'])
+c_area['area_num_1'] = c_area['area_num_1'].astype(float)
+c_area = c_area.merge(df_regions, how='inner')
+
 # Demographics
 test = demograph.transpose()
 test.columns = test.iloc[0]
@@ -92,12 +107,6 @@ demograph = demograph.rename(
              'Average of median household income in 2020 dollars':
                  'Avg. Med. Household Income (2020 Dollars)'})
 
-# use this to impute community area names to locations of bupren providers
-# map community areas to city regions 1-7
-
-area_dict = dict(zip(c_area.community, c_area.geometry))
-
-
 # Cleaning, filtering, joining to shapefiles
 bupren = bupren[(bupren['county'] == 'COOK') &
                 ((bupren['city'] == 'Chicago')
@@ -122,7 +131,7 @@ pharmacy['point_geo'] = pharmacy['New Georeferenced Column'
 pharmacy_gdf = geopandas.GeoDataFrame(pharmacy, geometry='point_geo')
 
 c_pharmacy_join = geopandas.sjoin(c_area, pharmacy_gdf,
-                                  how="inner", op='intersects')
+                                  how="inner", predicate='intersects')
 
 pharmacy_area = pd.DataFrame(c_pharmacy_join.groupby(
      ['community'])['area'].count()).reset_index().rename(
@@ -189,9 +198,10 @@ final_df = final_df.merge(opioid_2021_grouped, how='outer').rename(
 
 final_df = final_df.merge(bupren_area, how='outer')
 final_df = final_df.merge(pharmacy_area, how='outer')
+final_df = c_area.merge(final_df, how='inner')
 
 
-final_df = final_df[['area_num_1', 'community', 'shape_area', 'shape_len',
+final_df = final_df[['area_num_1', 'region', 'community', 'shape_area', 'shape_len',
                      'geometry', 'od_2019', 'od_2020', 'od_2021',
                      'bupren_area', 'pharmacy_area']].fillna(0)
 
@@ -213,6 +223,7 @@ final_df.to_csv('data_final/chicago_overdose.csv', index=False)
 
 
 final_merge = final_df.merge(demograph2, how='outer', indicator=True)
+
 
 # pharmacy = pharmacy.rename(columns={'New Georeferenced Column': 'point_obect'})
 # pharmacy_gdf = geopandas.GeoDataFrame(data=pharmacy, geometry=pharmacy['point_object'], crs=4329)
